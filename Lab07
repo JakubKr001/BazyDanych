@@ -1,0 +1,89 @@
+#1
+Przykład 1
+CREATE TABLE mikolajewskik.kreatura LIKE wikingowie.kreatura;
+INSERT INTO mikolajewskik.kreatura SELECT * FROM wikingowie.kreatura;
+
+CREATE TABLE mikolajewskik.uczestnicy LIKE wikingowie.uczestnicy;
+INSERT INTO mikolajewskik.uczestnicy SELECT * FROM wikingowie.uczestnicy;
+
+CREATE TABLE mikolajewskik.etapy_wyprawy LIKE wikingowie.etapy_wyprawy;
+INSERT INTO mikolajewskik.etapy_wyprawy SELECT * FROM wikingowie.etapy_wyprawy;
+
+CREATE TABLE mikolajewskik.sektor LIKE wikingowie.sektor;
+INSERT INTO mikolajewskik.sektor SELECT * FROM wikingowie.sektor;
+
+CREATE TABLE mikolajewskik.wyprawa LIKE wikingowie.wyprawa;
+INSERT INTO mikolajewskik.wyprawa SELECT * FROM wikingowie.wyprawa;
+
+Przyklad 2
+SELECT k.nazwa, u.id_uczestnika FROM kreatura AS k
+LEFT JOIN uczestnicy AS u ON u.id_uczestnika=k.Idkreatury
+WHERE u.id_uczestnika IS NULL;
+
+Przykład 3
+SELECT w.nazwa, SUM(e.ilosc) FROM wyprawa AS w
+INNER JOIN uczestnicy AS u ON u.id_wyprawy=w.id_wyprawy
+INNER JOIN kreatura AS k ON u.id_uczestnika=k.idkreatury
+INNER JOIN ekwipunek AS e ON e.idKreatury=k.idkreatury
+GROUP BY w.nazwa;
+
+# 2
+Przykład 1
+SELECT w.nazwa, COUNT(u.id_uczestnika), GROUP_CONCAT(k.nazwa) FROM wyprawa AS w
+JOIN uczestnicy AS u ON u.id_wyprawy=w.id_wyprawy
+JOIN kreatura AS k ON u.id_uczestnika=k.idKreatury
+GROUP BY w.nazwa;
+
+Przyklad 2
+SELECT ew.idEtapu, w.nazwa, s.nazwa, w.data_rozpoczecia, w.kierownik, k.nazwa FROM etapy_wyprawy AS ew
+JOIN sektor AS s ON s.id_sektora=ew.sektor
+JOIN wyprawa AS w ON w.id_wyprawy=ew.idWyprawy
+INNER JOIN kreatura AS k ON w.kierownik=k.idKreatury
+ORDER BY w.data_rozpoczecia, ew.kolejnosc;
+
+# 3
+Przykład 1
+SELECT sektor.nazwa, COUNT(etapy_wyprawy.sektor) AS ilosc_odwiedzin FROM
+sektor LEFT JOIN etapy_wyprawy ON sektor.id_sektora=etapy_wyprawy.sektor
+GROUP BY sektor.nazwa;
+
+Przykład 2
+SELECT DISTINCT(kreatura.nazwa), IF(uczestnicy.id_wyprawy IS NULL, "Nie bral udzialu w wyprawie", "Bral udzialu w wyprawie") FROM kreatura
+LEFT JOIN uczestnicy ON kreatura.Idkreatury=uczestnicy.id_uczestnika
+ORDER BY kreatura.nazwa;
+
+# 4
+Przykład 1
+SELECT w.nazwa, SUM(LENGTH(ew.dziennik)) FROM wyprawa AS w
+JOIN etapy_wyprawy AS ew ON w.id_wyprawy=ew.idWyprawy
+GROUP BY w.nazwa
+HAVING SUM(LENGTH(ew.dziennik)) < 400;
+
+Przykład 2
+SELECT w.nazwa,COUNT(DISTINCT(u.id_uczestnika)), SUM(e.ilosc*z.waga)/COUNT(DISTINCT(u.id_uczestnika)) AS "AVG waga" FROM wyprawa AS w
+LEFT JOIN uczestnicy AS u ON w.id_wyprawy = u.id_wyprawy
+LEFT JOIN kreatura AS k ON u.id_uczestnika = k.idKreatury
+LEFT JOIN ekwipunek AS e ON k.idKreatury= e.idKreatury
+LEFT JOIN zasob AS z ON e.idZasobu = z.idZasobu
+GROUP BY w.nazwa;
+
+# 5
+Przykład 1
+SELECT k.nazwa, DATEDIFF(w.data_rozpoczecia, k.dataUr) AS wiek FROM wyprawa AS w
+JOIN uczestnicy AS u ON w.id_wyprawy = u.id_wyprawy
+JOIN kreatura AS k ON u.id_uczestnika = k.idKreatury
+JOIN etapy_wyprawy AS ew ON w.id_wyprawy=ew.idWyprawy
+WHERE ew.sektor = 7;
+
+© 2020 GitHub, Inc.
+Terms
+Privacy
+Security
+Status
+Help
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
