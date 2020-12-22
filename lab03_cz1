@@ -1,0 +1,48 @@
+# 1
+SELECT imie, nazwisko, YEAR(data_urodzenia) FROM pracownik;
+
+# 2
+SELECT imie, nazwisko, TIMESTAMPDIFF(YEAR, data_urodzenia, CURDATE()) AS wiek FROM pracownik;
+
+# 3
+SELECT d.nazwa, COUNT(p.id_pracownika) FROM dzial AS d
+JOIN pracownik AS p ON p.dzial=d.id_dzialu
+GROUP BY d.id_dzialu;
+
+# 4
+SELECT k.nazwa_kategori, s_m.ilosc FROM kategoria AS k
+INNER JOIN towar AS t ON t.kategoria=k.id_kategori
+JOIN stan_magazynowy AS s_m ON t.id_towaru=s_m.towar;
+
+# 5
+SELECT k.nazwa_kategori, GROUP_CONCAT(t.nazwa_towaru) FROM kategoria AS k
+INNER JOIN towar AS t ON t.kategoria=k.id_kategori
+GROUP BY k.nazwa_kategori;
+
+#6
+SELECT ROUND( AVG(pensja),2 ) FROM pracownik;
+
+# 7
+SELECT id_pracownika, AVG(pensja), TIMESTAMPDIFF(YEAR, data_zatrudnienia, CURDATE()) AS staz FROM pracownik
+WHERE TIMESTAMPDIFF(YEAR, data_zatrudnienia, CURDATE()) > 5
+GROUP BY id_pracownika;
+# 8
+SELECT t.nazwa_towaru, COUNT(pz.towar) FROM pozycja_zamowienia AS pz
+INNER JOIN towar AS t ON pz.towar=t.id_towaru
+GROUP BY t.id_towaru
+ORDER BY COUNT(pz.towar)
+DESC LIMIT 10;
+
+# 9
+SELECT z.numer_zamowienia, sum(pz.ilosc*pz.cena) AS wartosc
+FROM zamowienie z, pozycja_zamowienia pz
+WHERE z.id_zamowienia=pz.zamowienie
+AND YEAR(z.data_zamowienia)=2017 AND QUARTER(z.data_zamowienia)=1
+GROUP BY z.numer_zamowienia;
+# 10
+SELECT p.imie, p.nazwisko, SUM(pz.ilosc*pz.cena) AS Suma
+FROM zamowienie z, pozycja_zamowienia pz, pracownik p
+WHERE z.id_zamowienia=pz.zamowienie
+AND p.id_pracownika = z.pracownik_id_pracownika
+GROUP BY p.id_pracownika
+ORDER BY Suma DESC;
