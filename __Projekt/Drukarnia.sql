@@ -159,13 +159,14 @@ THEN
 SET potzeba_naprawy = true;
 END IF;
 END$$
-
+DELIMITER $$
 USE `mydb`$$
 CREATE DEFINER = CURRENT_USER TRIGGER `mydb`.`zniżka_dla_stałych` AFTER INSERT ON `Sprzedaż` FOR EACH ROW
 BEGIN
+DECLARE cena DECIMAL(7,2);                                                           
 IF ilosc_zamowien > 10
 THEN
-SET sprzedaż.cena = sprzedaż.cena*0.8;
+SET cena = cena*0.8;
 END IF;
 
 END$$
